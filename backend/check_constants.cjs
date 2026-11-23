@@ -1,0 +1,3 @@
+const { ADMISSIONS_COLLECTION_HYD, ADMISSIONS_COLLECTION_MUM } = require('./models/Admission');
+console.log('HYD:', ADMISSIONS_COLLECTION_HYD);
+console.log('MUM:', ADMISSIONS_COLLECTION_MUM);

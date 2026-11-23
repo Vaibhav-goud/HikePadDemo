@@ -1,0 +1,40 @@
+name: Firebase to MongoDB Sync
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Enable manual triggers
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync_group
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './firebase-mongo-sync/package-lock.json'
+
+      - name: Install Dependencies
+        working-directory: ./firebase-mongo-sync
+        run: npm install
+
+      - name: Run Sync Script
+        working-directory: ./firebase-mongo-sync
+        env:
+          MONGO_URI: ${{ secrets.MONGODB_URI }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node sync.js

@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+
+# Environment and Secrets
+.env
+backend/.env
+**/.env
+NETLIFY_ENV_VARS.txt
+*ServiceAccount*.json
+*serviceAccount*.json
+*Serviceaccount*.json
+*serviceaccount*.json
+serviceAccountKey.json
+serviceAccountKRA.json
+credentials.json
+backend/credentials.json
+users.json
+
+# Build outputs
+dist/
+build/
+.DS_Store
+*.log
+*.timestamp-*.mjs

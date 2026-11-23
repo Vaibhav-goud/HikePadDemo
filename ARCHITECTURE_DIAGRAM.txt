@@ -1,0 +1,308 @@
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                      HikePAD SYSTEM ARCHITECTURE DIAGRAM                      ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+                    ┌────────────────────────────────────┐
+                    │         👥 END USERS               │
+                    │  BDEs | Team Leaders | Admins      │
+                    │     Super Admins | Operations      │
+                    └────────────────┬───────────────────┘
+                                     │ HTTPS
+                                     ↓
+    ╔════════════════════════════════════════════════════════════════════╗
+    ║                     FRONTEND LAYER (Port 8080)                     ║
+    ╠════════════════════════════════════════════════════════════════════╣
+    ║  🎨 Technology Stack:                                              ║
+    ║     • React 18 + TypeScript                                        ║
+    ║     • Vite (Build tool & Dev server)                               ║
+    ║     • shadcn/ui + Tailwind CSS (UI Components)                     ║
+    ║     • Chart.js (Data Visualization)                                ║
+    ║     • Framer Motion (Animations)                                   ║
+    ║                                                                    ║
+    ║  📄 Key Pages:                                                     ║
+    ║     • Dashboard (KPIs, Charts, Rankings)                           ║
+    ║     • KRA Reports (Performance Analytics)                          ║
+    ║     • Team Management (Org Charts, Hierarchy)                      ║
+    ║     • Admin Upload (Excel/CSV Import)                              ║
+    ║     • Analytics (Advanced Metrics)                                 ║
+    ║                                                                    ║
+    ║  🔐 Features:                                                      ║
+    ║     • Role-based Access Control (RBAC)                             ║
+    ║     • JWT Token Authentication                                     ║
+    ║     • Responsive Design (Mobile-first)                             ║
+    ╚════════════════════════════════════════════════════════════════════╝
+                                     │
+                          REST API (JSON) + JWT Token
+                                     ↓
+    ╔════════════════════════════════════════════════════════════════════╗
+    ║                     BACKEND API LAYER (Port 3000)                  ║
+    ╠════════════════════════════════════════════════════════════════════╣
+    ║  🚀 Technology Stack:                                              ║
+    ║     • Node.js + Express.js                                         ║
+    ║     • JWT for Authentication                                       ║
+    ║     • Multer (File Upload)                                         ║
+    ║     • xlsx + csv-parser (Data Processing)                          ║
+    ║     • Nodemailer (Email Service)                                   ║
+    ║                                                                    ║
+    ║  🔌 Main API Endpoints:                                            ║
+    ║     POST   /api/login                  (Authentication)            ║
+    ║     GET    /api/sales-records          (Fetch sales data)          ║
+    ║     POST   /api/sales-records          (Upload Excel/CSV)          ║
+    ║     GET    /api/kra-reports            (KRA analytics)             ║
+    ║     GET    /api/teams                  (Team structure)            ║
+    ║     POST   /api/admin/send-bulk-email  (Bulk emails)               ║
+    ║     POST   /api/admin/create-user      (User management)           ║
+    ║                                                                    ║
+    ║  🔐 Authentication & Security:                                     ║
+    ║     • JWT token validation middleware                              ║
+    ║     • Role-based authorization                                     ║
+    ║     • AES password encryption                                      ║
+    ║     • bcrypt fallback for legacy passwords                         ║
+    ║     • CORS protection                                              ║
+    ╚════════════════════════════════════════════════════════════════════╝
+                                     │
+                            MongoDB Driver (Native)
+                                     ↓
+    ╔════════════════════════════════════════════════════════════════════╗
+    ║                  FIREBASE-MONGODB SYNC SERVICE                     ║
+    ╠════════════════════════════════════════════════════════════════════╣
+    ║  🔄 Real-time Data Synchronization Service                         ║
+    ║                                                                    ║
+    ║  📡 Sync Paths:                                                    ║
+    ║     Firebase Path                    MongoDB Collection            ║
+    ║     ─────────────────────────────────────────────────────          ║
+    ║     /logs_HYD/daily_logs      →      KRA_Reports_HYD               ║
+    ║     /logs_MUM/daily_logs      →      KRA_Reports_MUM               ║
+    ║                                                                    ║
+    ║  ⚡ Features:                                                      ║
+    ║     • Real-time Firebase listeners (on 'value' event)              ║
+    ║     • Bulk upsert operations (performance optimized)               ║
+    ║     • Automatic name normalization (Title Case)                    ║
+    ║     • Branch-specific data tagging                                 ║
+    ║     • Hourly heartbeat monitoring                                  ║
+    ║     • Graceful shutdown handling (SIGINT/SIGTERM)                  ║
+    ║                                                                    ║
+    ║  📊 Monitoring:                                                    ║
+    ║     • Sync statistics logging                                      ║
+    ║     • Error tracking & logging                                     ║
+    ║     • Timestamp tracking for each sync                             ║
+    ╚════════════════════════════════════════════════════════════════════╝
+                    │                                    │
+          Firebase Admin SDK                    MongoDB Driver
+                    ↓                                    ↓
+    
+    ┌─────────────────────────────┐       ┌──────────────────────────────┐
+    │  🔥 FIREBASE REALTIME DB    │       │  🍃 MONGODB ATLAS            │
+    ├─────────────────────────────┤       ├──────────────────────────────┤
+    │                             │       │                              │
+    │  📁 Database Structure:     │       │  📦 Database Name:           │
+    │                             │       │     hike_dashboard_db        │
+    │  /logs_HYD/                 │       │                              │
+    │    /daily_logs/             │◄─────►│  📊 Collections:             │
+    │      /2026-02-09/           │       │     • sales_records          │
+    │        /{uid}/              │ Sync  │     • users                  │
+    │          • name             │       │     • KRA_Reports_HYD        │
+    │          • prospects        │       │     • KRA_Reports_MUM        │
+    │          • duration         │       │     • drives                 │
+    │          • calls            │       │     • system_settings        │
+    │          • date             │       │                              │
+    │                             │       │  🔒 Security:                │
+    │  /logs_MUM/                 │       │     • Encrypted connections  │
+    │    /daily_logs/             │       │     • Role-based access      │
+    │      (same structure)       │       │     • MongoDB Atlas          │
+    │                             │       │                              │
+    │  ⚡ Features:               │       │  📈 Performance:             │
+    │     • Real-time updates     │       │     • Indexed queries        │
+    │     • Branch separation     │       │     • Aggregation pipelines  │
+    │     • Daily log partitions  │       │     • Connection pooling     │
+    │                             │       │                              │
+    └─────────────────────────────┘       └──────────────────────────────┘
+                                                      ↑
+                                                      │
+                                          MongoDB Queries
+                                                      │
+                    ┌─────────────────────────────────┴──────────┐
+                    │                                            │
+    ╔═══════════════════════════════╗         ╔══════════════════════════╗
+    ║   📧 EXTERNAL SERVICES        ║         ║  🔧 UTILITIES            ║
+    ╠═══════════════════════════════╣         ╠══════════════════════════╣
+    ║                               ║         ║                          ║
+    ║  Gmail API (Nodemailer):      ║         ║  • File Processing       ║
+    ║    • Bulk email notifications ║         ║  • Data Validation       ║
+    ║    • Password setup emails    ║         ║  • Header Normalization  ║
+    ║    • System announcements     ║         ║  • Encryption/Decryption ║
+    ║    • HTML template rendering  ║         ║  • JWT Token Generation  ║
+    ║                               ║         ║  • Error Logging         ║
+    ║  Google OAuth 2.0             ║         ║                          ║
+    ║    • Service account auth     ║         ║                          ║
+    ║                               ║         ║                          ║
+    ╚═══════════════════════════════╝         ╚══════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════════════════
+                            DATA FLOW EXAMPLES
+═══════════════════════════════════════════════════════════════════════════
+
+1. USER LOGIN FLOW:
+   User enters credentials → Frontend /login
+       ↓
+   POST /api/login {userId, password}
+       ↓
+   Backend validates against MongoDB users collection
+       ↓
+   Generate & return JWT token + user data
+       ↓
+   Frontend stores token & redirects to Dashboard
+       ↓
+   All future requests include: Authorization: Bearer {token}
+
+
+2. SALES DATA UPLOAD FLOW:
+   Admin uploads Excel/CSV → Frontend upload form
+       ↓
+   POST /api/sales-records (multipart/form-data)
+       ↓
+   Backend parses file (xlsx/csv-parser)
+       ↓
+   Validate & normalize headers (case-insensitive)
+       ↓
+   Transform to MongoDB schema
+       ↓
+   Bulk upsert to sales_records collection
+       ↓
+   Return success/error response
+       ↓
+   Frontend shows confirmation & refreshes data
+
+
+3. REAL-TIME KRA SYNC FLOW:
+   External system updates Firebase → /logs_HYD/daily_logs
+       ↓
+   Firebase triggers 'value' event
+       ↓
+   Sync Service listener detects change
+       ↓
+   Fetch all records from Firebase path
+       ↓
+   Normalize names to Title Case
+       ↓
+   Prepare bulk upsert operations
+       ↓
+   Execute bulkWrite to MongoDB KRA_Reports_HYD
+       ↓
+   Log sync statistics (new: X, updated: Y)
+
+
+4. DASHBOARD DATA RETRIEVAL:
+   User views Dashboard → Frontend requests data
+       ↓
+   GET /api/sales-records?branch=HYD&month=FEBRUARY
+       ↓
+   Backend queries MongoDB with filters
+       ↓
+   Aggregate data (totals, averages, rankings)
+       ↓
+   Return JSON response
+       ↓
+   Frontend renders: Charts, KPIs, Tables, Rankings
+
+
+═══════════════════════════════════════════════════════════════════════════
+                        DEPLOYMENT ARCHITECTURE
+═══════════════════════════════════════════════════════════════════════════
+
+LOCAL DEVELOPMENT:
+   Terminal 1: npm run dev              (Frontend on port 8080)
+   Terminal 2: node backend/server.js   (Backend on port 3000)
+   Terminal 3: node firebase-mongo-sync/sync.js   (Sync Service)
+
+
+PRODUCTION:
+   ┌──────────────────┐
+   │  Netlify CDN     │  ← Frontend (Static Build)
+   │  Port: 443/HTTPS │
+   └────────┬─────────┘
+            │
+            ↓ REST API
+   ┌──────────────────┐
+   │  Render.com      │  ← Backend API + Sync Service
+   │  Port: 3000      │     (PM2 Process Manager)
+   └────────┬─────────┘
+            │
+            ↓ MongoDB Driver
+   ┌──────────────────┐
+   │  MongoDB Atlas   │  ← Production Database
+   │  Cloud Cluster   │
+   └──────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+                         SECURITY LAYERS
+═══════════════════════════════════════════════════════════════════════════
+
+Layer 1: TRANSPORT
+   • HTTPS/TLS encryption
+   • Secure WebSocket connections
+
+Layer 2: AUTHENTICATION
+   • JWT tokens (12-hour expiry)
+   • Secure password storage (AES encryption)
+   • bcrypt fallback for legacy passwords
+
+Layer 3: AUTHORIZATION
+   • Role-based access control (RBAC)
+   • Middleware: authenticateToken, requireAdmin
+   • Route-level permissions
+
+Layer 4: DATA PROTECTION
+   • MongoDB encrypted connections
+   • Environment variable protection
+   • Input validation & sanitization
+   • CORS whitelisting
+
+Layer 5: APPLICATION
+   • Error boundary handling
+   • Rate limiting (future)
+   • Audit logging (admin actions)
+
+
+═══════════════════════════════════════════════════════════════════════════
+                      USER ROLES & PERMISSIONS
+═══════════════════════════════════════════════════════════════════════════
+
+┌──────────────────┬─────────┬──────────┬──────────────┬───────────────┐
+│ FEATURE          │  BDE    │   TL     │  Admin/Ops   │  Super Admin  │
+├──────────────────┼─────────┼──────────┼──────────────┼───────────────┤
+│ View Own Data    │    ✓    │    ✓     │      ✓       │       ✓       │
+│ View Team Data   │    ✗    │    ✓     │      ✓       │       ✓       │
+│ View All Data    │    ✗    │    ✗     │      ✓       │       ✓       │
+│ Upload Sales     │    ✗    │    ✗     │      ✓       │       ✓       │
+│ Manage Users     │    ✗    │    ✗     │      ✗       │       ✓       │
+│ Send Bulk Email  │    ✗    │    ✗     │      ✓       │       ✓       │
+│ View Passwords   │    ✗    │    ✗     │      ✗       │       ✓       │
+│ Delete Users     │    ✗    │    ✗     │      ✗       │       ✓       │
+└──────────────────┴─────────┴──────────┴──────────────┴───────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+                         KEY PERFORMANCE METRICS
+═══════════════════════════════════════════════════════════════════════════
+
+Current System Stats (as of Feb 9, 2026):
+   • Total KRA Records (HYD): 697 records
+   • Total KRA Records (MUM): 973 records
+   • Active Users: ~50+
+   • Real-time sync latency: < 2 seconds
+   • API average response time: ~200ms
+   • Database size: Growing (historical data retained)
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+                    📝 Document Version: 1.0
+                    📅 Last Updated: February 9, 2026
+                    👥 Maintained by: HikeEducation Development Team
+
+═══════════════════════════════════════════════════════════════════════════
